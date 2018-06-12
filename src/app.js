@@ -6,7 +6,7 @@ const rp = require('request-promise-native');
 app.use(bodyParser.json({limit: '10mb'}));
 
 app.post('/', async function (req, res) {
-  console.log(`Got request: ${ req.body }`);
+  console.log(`Got request: ${ JSON.stringify(req.body) }`);
   try {
     if (req.body.method === 'eth_sendRawTransaction') {
       const decodedTx = txDecoder.decodeTx(req.body.params[0]);
