@@ -15,6 +15,17 @@ app.post('/', async function (req, res) {
         res.status(500).json({ error: `Can't send transaction with zero gas price!` });
         return;
       }
+    } else {
+      for (let request of req.body) {
+        if (request.method === 'eth_sendRawTransaction') {
+          const decodedTx = txDecoder.decodeTx(request.params[0]);
+          if (decodedTx.gasPrice.eq(0)) {
+            console.log(`Rejecting transaction with zero gas price ${ decodedTx }`);
+            res.status(500).json({error: `Can't send transaction with zero gas price!`});
+            return;
+          }
+        }
+      }
     }
 
     const options = {
