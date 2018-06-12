@@ -3,7 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const rp = require('request-promise-native');
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '10mb'}));
 
 app.post('/', async function (req, res) {
   try {
