@@ -1,0 +1,34 @@
+{
+  "name": "eth-node-proxy",
+  "version": "0.0.1",
+  "description": "Ethereum node proxy allowing to filter out zero gas price raw transactions.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon -w ./src src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/artemii235/eth-node-proxy.git"
+  },
+  "keywords": [
+    "Ethereum",
+    "Parity",
+    "Geth",
+    "Proxy"
+  ],
+  "author": "ortgma@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/artemii235/eth-node-proxy/issues"
+  },
+  "homepage": "https://github.com/artemii235/eth-node-proxy#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "ethereum-tx-decoder": "^2.0.1",
+    "express": "^4.16.3",
+    "nodemon": "^1.17.5",
+    "request": "^2.87.0",
+    "request-promise-native": "^1.0.5"
+  }
+}
