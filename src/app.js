@@ -2,25 +2,25 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const rp = require('request-promise-native');
+const txDecoder = require('ethereum-tx-decoder');
 
-app.use(bodyParser.json({limit: '10mb'}));
+app.use(bodyParser.json());
 
 app.post('/', async function (req, res) {
-  console.log(`Got request: ${ JSON.stringify(req.body) }`);
   try {
     if (req.body.method === 'eth_sendRawTransaction') {
       const decodedTx = txDecoder.decodeTx(req.body.params[0]);
       if (decodedTx.gasPrice.eq(0)) {
-        console.log(`Rejecting transaction with zero gas price ${ decodedTx }`);
+        console.log(`Rejecting transaction with zero gas price ${ req.body.params[0] }`);
         res.status(500).json({ error: `Can't send transaction with zero gas price!` });
         return;
       }
-    } else {
+    } else if (typeof req.body[Symbol.iterator] === 'function') {
       for (let request of req.body) {
         if (request.method === 'eth_sendRawTransaction') {
           const decodedTx = txDecoder.decodeTx(request.params[0]);
           if (decodedTx.gasPrice.eq(0)) {
-            console.log(`Rejecting transaction with zero gas price ${ decodedTx }`);
+            console.log(`Rejecting transaction with zero gas price ${ request.params[0] }`);
             res.status(500).json({error: `Can't send transaction with zero gas price!`});
             return;
           }
