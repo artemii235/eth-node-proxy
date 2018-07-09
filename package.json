@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/artemii235/eth-node-proxy#readme",
   "dependencies": {
+    "bn.js": "^4.11.8",
     "body-parser": "^1.18.3",
     "ethereum-tx-decoder": "^2.0.1",
     "express": "^4.16.3",

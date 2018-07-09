@@ -3,6 +3,10 @@ const app = express();
 const bodyParser = require('body-parser');
 const rp = require('request-promise-native');
 const txDecoder = require('ethereum-tx-decoder');
+const BN = require('bn.js');
+
+// 1 gwei by default
+let gasPrice = new BN('1000000000');
 
 app.use(bodyParser.json());
 
@@ -10,18 +14,18 @@ app.post('/', async function (req, res) {
   try {
     if (req.body.method === 'eth_sendRawTransaction') {
       const decodedTx = txDecoder.decodeTx(req.body.params[0]);
-      if (decodedTx.gasPrice.eq(0)) {
-        console.log(`Rejecting transaction with zero gas price ${ req.body.params[0] }`);
-        res.status(500).json({ error: `Can't send transaction with zero gas price!` });
+      if (decodedTx.gasPrice.lt(gasPrice)) {
+        console.log(`Rejecting transaction with too low gas price ${ req.body.params[0] }`);
+        res.status(500).json({ error: `Can't send transaction with too low gas price!` });
         return;
       }
     } else if (typeof req.body[Symbol.iterator] === 'function') {
       for (let request of req.body) {
         if (request.method === 'eth_sendRawTransaction') {
           const decodedTx = txDecoder.decodeTx(request.params[0]);
-          if (decodedTx.gasPrice.eq(0)) {
-            console.log(`Rejecting transaction with zero gas price ${ request.params[0] }`);
-            res.status(500).json({error: `Can't send transaction with zero gas price!`});
+          if (decodedTx.gasPrice.lt(gasPrice)) {
+            console.log(`Rejecting transaction with too low gas price ${ request.params[0] }`);
+            res.status(500).json({error: `Can't send transaction with too low gas price!`});
             return;
           }
         }
@@ -55,3 +59,20 @@ app.use(function(err, req, res, next) {
   console.log(err);
   res.status(500).json({error: 'Error occurred'});
 });
+
+// update gas price every minute
+setInterval(async function () {
+  try {
+    const options = {
+      method: 'GET',
+      uri: "https://ethgasstation.info/json/ethgasAPI.json",
+      json: true
+    };
+
+    const response = await rp(options);
+    gasPrice = new BN(response.safeLow).mul(new BN('100000000'));
+  } catch (e) {
+    console.log(`Error while updating gas price`);
+    console.log(e);
+  }
+}, 60000);
