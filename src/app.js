@@ -75,4 +75,4 @@ setInterval(async function () {
     console.log(`Error while updating gas price`);
     console.log(e);
   }
-}, 60000);
+}, 10000);
