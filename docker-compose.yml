@@ -3,6 +3,7 @@ services:
   workspace:
     volumes:
       - .:/usr/src/app
+      - /home/artem/logs:/usr/log
     working_dir: /usr/src/app
     image: mhart/alpine-node:10.4.0
     tty: true
