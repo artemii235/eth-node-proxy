@@ -95,7 +95,11 @@ setInterval(async function () {
     };
 
     const response = await rp(options);
-    gasPrice = new BN(response.safeLow).mul(new BN('100000000'));
+    let newGasPrice = new BN(response.safeLow).mul(new BN('100000000'));
+    if (newGasPrice.eq(0)) {
+      newGasPrice = new BN('1000000000');
+    }
+    gasPrice = newGasPrice;
   } catch (e) {
     logger.error(`Error while updating gas price`);
     logger.error(e);
