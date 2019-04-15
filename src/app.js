@@ -4,21 +4,24 @@ const bodyParser = require('body-parser');
 const rp = require('request-promise-native');
 const txDecoder = require('ethereum-tx-decoder');
 const BN = require('bn.js');
-const morgan = require('morgan');
 const fs = require('fs');
 const winston = require('winston');
-
-morgan.token('body', function getId (req) {
-  return JSON.stringify(req.body);
-});
-
-const accessLogStream = fs.createWriteStream('/usr/log/access.log', { flags: 'a' });
 
 // 1 gwei by default
 let gasPrice = new BN('1000000000');
 
 app.use(bodyParser.json());
-app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :body', {stream: accessLogStream}));
+
+if (process.env.ACCESS_LOG === 'true') {
+  const morgan = require('morgan');
+
+  morgan.token('body', function getId (req) {
+    return JSON.stringify(req.body);
+  });
+
+  const accessLogStream = fs.createWriteStream('/usr/log/access.log', {flags: 'a'});
+  app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :body', {stream: accessLogStream}));
+}
 
 const myFormat = winston.format.printf(info => {
   return `${info.timestamp} ${info.message}`;
